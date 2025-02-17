@@ -1,0 +1,8 @@
+.headerText {
+  user-select: none;
+}
+
+.navbarLink {
+  align-items: center;
+  display: flex;
+}
