@@ -1,4 +1,4 @@
-import { IconHome, IconSettings } from '@tabler/icons-react';
+import { IconHome, IconSandbox, IconSettings } from '@tabler/icons-react';
 import { Link, Outlet } from 'react-router';
 import { AppShell, Box, Burger, Group, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -42,6 +42,10 @@ export function PrimaryLayout() {
         <Box className={classes.navbarLink}>
           <IconSettings />
           <Link to="/settings">Settings</Link>
+        </Box>
+        <Box className={classes.navbarLink}>
+          <IconSandbox />
+          <Link to="/sandbox">Sandbox</Link>
         </Box>
       </AppShell.Navbar>
       <AppShell.Main>

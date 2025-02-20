@@ -1,0 +1,32 @@
+.keyboardNoteSelector.keyboard {
+  display: flex;
+}
+
+.keyboardNoteSelector.keyboard .key {
+  background-color: #fff;
+  border: none;
+  color: #000;
+  display: flex;
+  height: 4em;
+  margin: 0 0.1667%;
+  user-select: none;
+  width: 8%;
+}
+
+.keyboardNoteSelector .key .key-label {
+  color: #000;
+}
+
+.keyboardNoteSelector .key.accidental {
+  background-color: #000;
+  height: 3em;
+}
+
+.keyboardNoteSelector .key.key.accidental .keyLabel {
+  color: #fff;
+}
+
+.keyboardNoteSelector .key .keyLabel {
+  font-size: 1.5em;
+  margin: auto;
+}

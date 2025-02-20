@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import { PrimaryLayout } from '@/layouts/PrimaryLayout';
 import { HomePage } from '@/pages/Home.page';
+import { SandboxPage } from '@/pages/Sandbox.page';
 import { SettingsPage } from '@/pages/Settings.page';
 
 const routes = [
@@ -10,6 +11,10 @@ const routes = [
       {
         element: <HomePage />,
         path: '/',
+      },
+      {
+        element: <SandboxPage />,
+        path: '/sandbox',
       },
       {
         element: <SettingsPage />,
