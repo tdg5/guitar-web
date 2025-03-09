@@ -1,31 +1,34 @@
 import { useEffect, useRef, useState } from 'react';
-import { Fretboard, Position } from '@moonwave99/fretboard.js';
 import _ from 'lodash';
-import { FRETBOARD_MOUSE_EVENT_NAMES } from './constants';
 import {
-  FretboardMouseEventHandler,
-  FretboardMouseEventName,
+  FRETBOARD_MOUSE_AND_TOUCH_EVENT_NAMES,
+  Fretboard,
+  FretboardMouseOrTouchEventHandler,
+  FretboardMouseOrTouchEventName,
   FretboardOptions,
-} from './FretboardJsExtraTypes';
+  Position,
+} from './FretboardJsProvider';
 
-export type { Fretboard, FretboardSystem, Position } from '@moonwave99/fretboard.js';
 export type {
-  FretboardMouseEventHandler,
-  FretboardMouseEventName,
+  Fretboard,
+  FretboardMouseOrTouchEventHandler,
+  FretboardMouseOrTouchEventName,
   FretboardOptions,
+  FretboardSystem,
   FretboardSystemOptions,
-} from './FretboardJsExtraTypes';
+  Position,
+} from './FretboardJsProvider';
 
 export type SvgFretboardProps = {
-  [key in FretboardMouseEventName]?: FretboardMouseEventHandler;
+  [key in FretboardMouseOrTouchEventName]?: FretboardMouseOrTouchEventHandler;
 } & {
   positions?: Position[];
   fretboardOptions?: FretboardOptions;
 };
 
 const getEventHandlers = (props: SvgFretboardProps) => {
-  const handlers = new Map<FretboardMouseEventName, FretboardMouseEventHandler>();
-  for (const eventName of FRETBOARD_MOUSE_EVENT_NAMES) {
+  const handlers = new Map<FretboardMouseOrTouchEventName, FretboardMouseOrTouchEventHandler>();
+  for (const eventName of FRETBOARD_MOUSE_AND_TOUCH_EVENT_NAMES) {
     const eventHandler = props[eventName];
     if (eventHandler) {
       handlers.set(eventName, eventHandler);
@@ -70,7 +73,7 @@ export function SvgFretboard(props: SvgFretboardProps) {
 
   const [fretboard, setFretboard] = useState(createFretboard);
 
-  const eventHandlers = useRef<Map<FretboardMouseEventName, FretboardMouseEventHandler>>(null);
+  const eventHandlers = useRef<Map<FretboardMouseOrTouchEventName, FretboardMouseOrTouchEventHandler>>(null);
 
   const setDotsAndRender = () => {
     fretboard.setDots(positions ?? []).render();

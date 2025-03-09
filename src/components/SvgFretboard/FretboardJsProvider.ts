@@ -1,8 +1,9 @@
-import { Barre, Position } from '@moonwave99/fretboard.js';
+import { Barre, FretboardSystem, Position } from '@philjollans/fretboard.js';
 import { BaseType, ValueFn } from 'd3-selection';
 
 export type { BaseType, ValueFn } from 'd3-selection';
-export type { Barre, Position } from '@moonwave99/fretboard.js';
+export type { Barre, Position } from '@philjollans/fretboard.js';
+export { Fretboard, FretboardSystem } from '@philjollans/fretboard.js';
 
 export type BoundsDimension = {
   fret: number;
@@ -81,6 +82,7 @@ export type FretboardOptions = {
   fretColor?: string;
   fretCount?: number;
   fretLeftPadding?: number;
+  fretMarkerColor?: string;
   fretNumbersColor?: string;
   fretNumbersHeight?: number;
   fretNumbersMargin?: number;
@@ -98,6 +100,7 @@ export type FretboardOptions = {
   nutWidth?: number;
   rightPadding?: number;
   scaleFrets?: boolean;
+  showFretMarkers?: boolean;
   showFretNumbers?: boolean;
   stringColor?: StringAttributeValue;
   stringCount?: number;
@@ -107,11 +110,47 @@ export type FretboardOptions = {
   width?: number;
 };
 
-export type FretboardMouseEventName = keyof Pick<
+export type FretboardMouseOrTouchEventName = keyof Pick<
   HTMLElementEventMap,
   {
-    [P in keyof HTMLElementEventMap]: HTMLElementEventMap[P] extends MouseEvent ? P : never;
+    [P in keyof HTMLElementEventMap]: HTMLElementEventMap[P] extends MouseEvent | TouchEvent ? P : never;
   }[keyof HTMLElementEventMap]
 >;
 
-export type FretboardMouseEventHandler = (position: Position, event: MouseEvent) => void;
+export type FretboardMouseOrTouchEventHandler = (position: Position, event: MouseEvent | TouchEvent) => void;
+
+export const FRETBOARD_MOUSE_AND_TOUCH_EVENT_NAMES: FretboardMouseOrTouchEventName[] = [
+  'auxclick',
+  'click',
+  'contextmenu',
+  'dblclick',
+  'drag',
+  'dragend',
+  'dragenter',
+  'dragleave',
+  'dragover',
+  'dragstart',
+  'drop',
+  'gotpointercapture',
+  'lostpointercapture',
+  'mousedown',
+  'mouseenter',
+  'mouseleave',
+  'mousemove',
+  'mouseout',
+  'mouseover',
+  'mouseup',
+  'pointercancel',
+  'pointerdown',
+  'pointerenter',
+  'pointerleave',
+  'pointermove',
+  'pointerout',
+  'pointerover',
+  'pointerup',
+  'touchcancel',
+  'touchend',
+  'touchmove',
+  'touchstart',
+  'wheel',
+];

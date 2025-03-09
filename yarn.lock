@@ -815,21 +815,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@moonwave99/fretboard.js@npm:^0.2.13":
-  version: 0.2.13
-  resolution: "@moonwave99/fretboard.js@npm:0.2.13"
-  dependencies:
-    "@tonaljs/interval": "npm:^4.5.1"
-    "@tonaljs/mode": "npm:^4.5.1"
-    "@tonaljs/note": "npm:^4.6.0"
-    "@tonaljs/scale": "npm:^4.6.0"
-    change-case: "npm:^4.1.2"
-    d3-selection: "npm:^1.4.1"
-    throttle-debounce: "npm:^2.2.1"
-  checksum: 10c0/689de89fa39e68dcd567317fa4240ea72d0816b1f80c057134fbd94a6e9222f2e371cf3b8fee1090cf57fcba8ceef9a8c4624f49de9dc54f26d9ca3583eab9da
-  languageName: node
-  linkType: hard
-
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -876,6 +861,21 @@ __metadata:
   dependencies:
     semver: "npm:^7.3.5"
   checksum: 10c0/c90935d5ce670c87b6b14fab04a965a3b8137e585f8b2a6257263bd7f97756dd736cb165bb470e5156a9e718ecd99413dccc54b1138c1a46d6ec7cf325982fe5
+  languageName: node
+  linkType: hard
+
+"@philjollans/fretboard.js@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@philjollans/fretboard.js@npm:1.0.2"
+  dependencies:
+    "@tonaljs/interval": "npm:^4.5.1"
+    "@tonaljs/mode": "npm:^4.5.1"
+    "@tonaljs/note": "npm:^4.6.0"
+    "@tonaljs/scale": "npm:^4.6.0"
+    change-case: "npm:^4.1.2"
+    d3-selection: "npm:^1.4.1"
+    throttle-debounce: "npm:^2.2.1"
+  checksum: 10c0/9ffaaa9e17740255d1955e429e15460c2f2522a7498832df6364ccdb554c857f497a741c864880200c6535ea5d8dc52d2b58ebb9887a3109df66b0d7ed536e49
   languageName: node
   linkType: hard
 
@@ -3977,7 +3977,7 @@ __metadata:
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.4.1"
     "@mantine/core": "npm:7.16.3"
     "@mantine/hooks": "npm:7.16.3"
-    "@moonwave99/fretboard.js": "npm:^0.2.13"
+    "@philjollans/fretboard.js": "npm:^1.0.2"
     "@storybook/addon-essentials": "npm:^8.5.8"
     "@storybook/react": "npm:^8.5.0"
     "@storybook/react-vite": "npm:^8.5.0"

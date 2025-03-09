@@ -13,6 +13,7 @@ export function SandboxPage() {
     middleFretColor: 'black',
     middleFretWidth: 1,
     nutWidth: 1,
+    showFretMarkers: false,
     showFretNumbers: false,
   };
 
