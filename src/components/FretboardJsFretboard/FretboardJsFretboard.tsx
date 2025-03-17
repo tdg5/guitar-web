@@ -19,14 +19,14 @@ export type {
   Position,
 } from './FretboardJsProvider';
 
-export type SvgFretboardProps = {
+export type FretboardJsFretboardProps = {
   [key in FretboardMouseOrTouchEventName]?: FretboardMouseOrTouchEventHandler;
 } & {
   positions?: Position[];
   fretboardOptions?: FretboardOptions;
 };
 
-const getEventHandlers = (props: SvgFretboardProps) => {
+const getEventHandlers = (props: FretboardJsFretboardProps) => {
   const handlers = new Map<FretboardMouseOrTouchEventName, FretboardMouseOrTouchEventHandler>();
   for (const eventName of FRETBOARD_MOUSE_AND_TOUCH_EVENT_NAMES) {
     const eventHandler = props[eventName];
@@ -52,7 +52,7 @@ function mapsAreEqual<K, V>(map1: Map<K, V>, map2: Map<K, V>): boolean {
   return true;
 }
 
-export function SvgFretboard(props: SvgFretboardProps) {
+export function FretboardJsFretboard(props: FretboardJsFretboardProps) {
   const { positions } = props;
   const fretboardDivRef = useRef<HTMLDivElement>(null);
   const [isRendered, setIsRendered] = useState(false);
