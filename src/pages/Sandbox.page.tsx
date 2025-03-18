@@ -1,13 +1,14 @@
 import { useCallback, useState } from 'react';
 import { KeyboardNoteSelector } from '@/components/KeyboardNoteSelector/KeyboardNoteSelector';
-import { FretboardOptions, Position, FretboardJsFretboard } from '@/components/FretboardJsFretboard/FretboardJsFretboard';
+import { FretboardJsOptions, Position, FretboardJsFretboard } from '@/components/FretboardJsFretboard/FretboardJsFretboard';
+import { SvgFretboard } from '@/components/SvgFretboard/SvgFretboard';
 import { INote } from '@/types/INote';
 
 const NoteSelectorInputCallback = (_: INote) => {};
 
 export function SandboxPage() {
   const setDotText = ({ degree }: Position) => degree?.toString() ?? '';
-  const fretboardOptions: FretboardOptions = {
+  const fretboardOptions: FretboardJsOptions = {
     dotText: useCallback(setDotText, []),
     fretCount: 12,
     middleFretColor: 'black',
@@ -38,6 +39,11 @@ export function SandboxPage() {
   return (
     <>
       <FretboardJsFretboard click={click} positions={positions} fretboardOptions={fretboardOptions} />
+      <div style={{height: '350px'}} >
+        <SvgFretboard
+          nutWidth={1}
+        />
+      </div>
       <KeyboardNoteSelector inputCallback={NoteSelectorInputCallback} />
     </>
   );

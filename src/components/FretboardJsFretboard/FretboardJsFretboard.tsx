@@ -13,7 +13,7 @@ export type {
   Fretboard,
   FretboardMouseOrTouchEventHandler,
   FretboardMouseOrTouchEventName,
-  FretboardOptions,
+  FretboardOptions as FretboardJsOptions,
   FretboardSystem,
   FretboardSystemOptions,
   Position,

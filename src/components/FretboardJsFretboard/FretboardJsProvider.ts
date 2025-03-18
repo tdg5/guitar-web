@@ -1,4 +1,4 @@
-import { Barre, FretboardSystem, Position } from '@philjollans/fretboard.js';
+import { Barre, Position } from '@philjollans/fretboard.js';
 import { BaseType, ValueFn } from 'd3-selection';
 
 export type { BaseType, ValueFn } from 'd3-selection';
