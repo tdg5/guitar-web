@@ -1,3 +1,4 @@
+import { MouseEvent } from 'react';
 import {
   DEFAULT_COLORS,
   DEFAULT_DIMENSIONS,
@@ -20,7 +21,15 @@ type StringColor = string | ((stringNumber: number) => string);
 
 type Tuning = string[];
 
+export type PositionBoundary = {
+  bottom: number;
+  left: number;
+  right: number;
+  top: number;
+}
+
 export type Position = {
+  boundary: PositionBoundary,
   chroma?: number;
   degree?: number;
   disabled?: boolean;
@@ -67,6 +76,7 @@ export type SvgFretboardOptions = {
   paddingTop: number;
   positions: Position[],
   scaleFrets: boolean,
+  showFretInlay: boolean;
   showFretNumbers: boolean;
   stringColor: string;
   stringCount: number;
@@ -75,11 +85,19 @@ export type SvgFretboardOptions = {
   width: number;
 }
 
-type StringOptions = {
+type FretboardDimensions = {
+  fretNumbersHeight: number;
+  fretOffsets: number[];
   height: number;
-  stringCount: number;
-  stringColor: StringColor;
-  stringWidth: StringWidth;
+  paddingBottom: number;
+  paddingLeft: number;
+  paddingRight: number;
+  paddingTop: number;
+  stringOffsets: number[];
+  stringWidths: number[];
+  totalHeight: number;
+  totalWidth: number;
+  width: number;
 }
 
 const defaultSvgFretboardOptions: SvgFretboardOptions = {
@@ -116,6 +134,7 @@ const defaultSvgFretboardOptions: SvgFretboardOptions = {
   paddingTop: DEFAULT_DIMENSIONS.unit,
   positions: [],
   scaleFrets: true,
+  showFretInlay: true,
   showFretNumbers: true,
   stringColor: DEFAULT_COLORS.line,
   stringCount: 6,
@@ -124,38 +143,36 @@ const defaultSvgFretboardOptions: SvgFretboardOptions = {
   width: 960,
 };
 
-function getStringMidPointsY(
+function getStringOffsets(
   height: number,
-  stringCount: number,
-  stringWidth: StringWidth,
-) {
-  const stringMidPointsY: number[] = [];
+  stringWidths: number[],
+): number[] {
+  const stringCount = stringWidths.length;
+  const stringOffsetsY: number[] = [];
   for (let stringNumber = 0; stringNumber < stringCount; stringNumber++)
   {
     const fractionOfFretboardHeight = height / (stringCount - 1);
-    const stringWidthValue = typeof(stringWidth) === 'function'
-      ? stringWidth(stringNumber + 1) : stringWidth;
-    const halfStringWidth = stringWidthValue / 2;
-    let midPointY: number;
+    const stringWidth = stringWidths[stringNumber];
+    const halfStringWidth = stringWidth / 2;
+    let offsetY: number;
     if (stringNumber === stringCount - 1) {
-      midPointY = height - halfStringWidth;
+      offsetY = height - halfStringWidth;
     }
     else {
-      midPointY = (stringNumber * fractionOfFretboardHeight) + halfStringWidth;
+      offsetY = (stringNumber * fractionOfFretboardHeight) + halfStringWidth;
     }
-    stringMidPointsY[stringNumber] = midPointY;
+    stringOffsetsY[stringNumber] = offsetY;
   }
-  return stringMidPointsY;
+  return stringOffsetsY;
 }
 
-function getStringElements({
-  height,
-  stringCount,
-  stringColor,
-  stringWidth,
-}: StringOptions) {
-  const stringMidPointsY = getStringMidPointsY(height, stringCount, stringWidth);
-  const strings = stringMidPointsY.map((midPointY, stringNumber) => {
+function getStringElements(
+  fretboardTotalWidth: number,
+  stringColor: StringColor,
+  stringOffsetsY: number[],
+  stringWidth: StringWidth,
+) {
+  const strings = stringOffsetsY.map((midPointY, stringNumber) => {
     const stringColorValue = typeof(stringColor) === "function" ? stringColor(stringNumber) : stringColor;
     const stringWidthValue =
       typeof(stringWidth) === "function" ? stringWidth(stringNumber) : stringWidth;
@@ -166,7 +183,7 @@ function getStringElements({
         stroke={stringColorValue}
         strokeWidth={stringWidthValue}
         x1={0}
-        x2={'100%'}
+        x2={fretboardTotalWidth}
         y1={midPointY}
         y2={midPointY}
       >
@@ -177,38 +194,63 @@ function getStringElements({
   return <g className={'strings'}>{strings}</g>;
 }
 
+function getStringWidths(stringWidth: StringWidth, stringCount: number): number[] {
+  const stringWidths: number[] = [];
+  for (let stringNumber = 0; stringNumber < stringCount; stringNumber++)
+  {
+    const widthValue =
+      typeof(stringWidth) === "function" ? stringWidth(stringNumber + 1) : stringWidth;
+    stringWidths[stringNumber] = widthValue;
+  }
+  return stringWidths;
+}
+
 function getFretboardDimensions({
+  fretCount,
   fretNumbersHeight,
   height,
   paddingBottom,
   paddingLeft,
   paddingRight,
   paddingTop,
+  scaleFrets,
   showFretNumbers,
+  stringCount,
+  stringWidth,
   width,
 }: {
+  fretCount: number;
   fretNumbersHeight: number;
   height: number;
   paddingBottom: number;
   paddingLeft: number;
   paddingRight: number;
   paddingTop: number;
+  scaleFrets: boolean;
   showFretNumbers: boolean;
+  stringCount: number,
+  stringWidth: StringWidth,
   width: number;
-}): {
-  fullWidth: number;
-  fullHeight: number;
-} {
-  const fullWidth = width + paddingLeft + paddingRight;
-  let fullHeight = height + paddingTop + paddingBottom;
-
-  if (showFretNumbers) {
-    fullHeight += fretNumbersHeight;
-  }
-  return { fullWidth, fullHeight };
+}): FretboardDimensions {
+  const stringWidths = getStringWidths(stringWidth, stringCount);
+  return {
+    fretNumbersHeight: fretNumbersHeight,
+    fretOffsets: getFretOffsets(fretCount, scaleFrets),
+    height: height,
+    paddingBottom: paddingBottom,
+    paddingLeft: paddingLeft,
+    paddingRight: paddingRight,
+    paddingTop: paddingTop,
+    stringOffsets: getStringOffsets(height, stringWidths),
+    stringWidths: stringWidths,
+    totalHeight:
+      height + paddingTop + paddingBottom + (showFretNumbers ? fretNumbersHeight : 0),
+    totalWidth: width + paddingLeft + paddingRight,
+    width: width,
+  };
 }
 
-function getFretOffsets({fretCount, scaleFrets}: {fretCount: number, scaleFrets: boolean}) {
+function getFretOffsets(fretCount: number, scaleFrets: boolean) {
   const fretRatio = Math.pow(2, 1 / 12);
   const frets = [0];
 
@@ -225,21 +267,18 @@ function getFretOffsets({fretCount, scaleFrets}: {fretCount: number, scaleFrets:
 function getFretElements({
   height,
   fretColor,
-  fretCount,
+  fretOffsets,
   fretWidth,
   nutColor,
   nutWidth,
-  scaleFrets,
 }: {
   height: number;
   fretColor: string;
-  fretCount: number,
+  fretOffsets: number[];
   fretWidth: number;
   nutColor: string;
   nutWidth: number;
-  scaleFrets: boolean,
 }) {
-  const fretOffsets = getFretOffsets({fretCount, scaleFrets});
   const frets = fretOffsets.map((offset, index) => {
     const specificFretColor = index === 0 ? nutColor : fretColor;
     const specificFretWidth = index === 0 ? nutWidth : fretWidth;
@@ -260,17 +299,15 @@ function getFretElements({
 function getFretInlayPoints(
   {
     fretCount,
+    fretOffsets,
     height,
-    scaleFrets,
   }: {
-    height: number,
-    fretCount: number,
-    scaleFrets: boolean,
+    height: number;
+    fretCount: number;
+    fretOffsets: number[];
   }
 ): Point[] {
   const inlayPoints = [];
-  const fretOffsets = getFretOffsets({fretCount, scaleFrets});
-
   for (let fretNumber = 1; fretNumber <= fretCount; fretNumber++)
   {
     const fretModulo = fretNumber % 12;
@@ -293,6 +330,7 @@ function getFretInlayPoints(
 function getFretInlayElements(
   {
     fretCount,
+    fretOffsets,
     height,
     inlayFill,
     inlaySize,
@@ -302,6 +340,7 @@ function getFretInlayElements(
   }: {
     height: number,
     fretCount: number,
+    fretOffsets: number[],
     inlayFill: string,
     inlaySize: number,
     inlayStrokeColor: string,
@@ -309,7 +348,7 @@ function getFretInlayElements(
     scaleFrets: boolean,
   }
 ) {
-  const inlayPoints = getFretInlayPoints({fretCount, height, scaleFrets});
+  const inlayPoints = getFretInlayPoints({fretCount, fretOffsets, height});
   const inlays = inlayPoints.map((point, index) => {
     return <circle
       cx={`${point.x}%`}
@@ -330,31 +369,26 @@ function getFretNumbersElements({
   fretCount,
   fretNumbersColor,
   fretNumbersMargin,
-  height,
+  fretOffsets,
   paddingTop,
-  scaleFrets,
-  stringCount,
-  stringWidth,
+  stringOffsets,
 }: {
+  font: string;
   fretCount: number;
   fretNumbersColor: string;
   fretNumbersMargin: number;
-  font: string;
-  height: number;
+  fretOffsets: number[];
   paddingTop: number;
-  scaleFrets: boolean;
-  stringCount: number;
-  stringWidth: StringWidth;
+  stringOffsets: number[];
 }) {
   const fretNumbers = [];
-  const fretOffsets = getFretOffsets({fretCount, scaleFrets});
-  const stringOffsets = getStringMidPointsY(height, stringCount, stringWidth);
   const lastStringOffset = stringOffsets[stringOffsets.length - 1];
   for (let fretNumber = 1; fretNumber <= fretCount; fretNumber++)
   {
     const fretTextOffset = (fretOffsets[fretNumber - 1] + fretOffsets[fretNumber]) / 2;
     var fretText = <text
       fill={fretNumbersColor}
+      key={fretNumber}
       textAnchor={'middle'}
       x={`${fretTextOffset}%`}
     >
@@ -366,7 +400,7 @@ function getFretNumbersElements({
   const fretNumberGroup = <g
     className={`fret-numbers`}
     fontFamily={font}
-    transform={`translate(0 ${fretNumbersMargin + lastStringOffset})`}
+    transform={`translate(0 ${fretNumbersMargin + lastStringOffset + paddingTop})`}
   >
     {fretNumbers}
   </g>;
@@ -379,23 +413,55 @@ export const SvgFretboard = (props: Partial<SvgFretboardOptions>) => {
     ...props,
   };
 
-  const { fullHeight, fullWidth } = getFretboardDimensions(propsWithDefaults);
-  const { paddingLeft, paddingTop, showFretNumbers, width } = propsWithDefaults;
+  const {
+    fretOffsets,
+    paddingLeft,
+    paddingTop,
+    stringOffsets,
+    totalHeight,
+    totalWidth,
+    width,
+  } = getFretboardDimensions(propsWithDefaults);
 
-  const strings = getStringElements(propsWithDefaults);
-  const frets = getFretElements(propsWithDefaults);
-  const fretInlays = getFretInlayElements(propsWithDefaults);
-  const fretNumbers = getFretNumbersElements(propsWithDefaults);
+  const {
+    showFretInlay,
+    showFretNumbers,
+    stringColor,
+    stringWidth,
+  } = propsWithDefaults;
+
+  const strings = getStringElements(totalWidth, stringColor, stringOffsets, stringWidth);
+
+  const frets = getFretElements({...propsWithDefaults, fretOffsets});
+
+  const fretInlays = showFretInlay
+    ? getFretInlayElements({...propsWithDefaults, fretOffsets})
+    : null;
+
+  const fretNumbers = showFretNumbers
+    ? getFretNumbersElements({...propsWithDefaults, fretOffsets, stringOffsets})
+    : null;
+
+  // const positions = getPositions(
+  //   {
+
+  //   }
+  // );
+
+  const clickTest = (event: MouseEvent<SVGElement>) => {
+    console.log(`Clicked at: (${event.nativeEvent.offsetX}, ${event.nativeEvent.offsetY})`);
+    console.log(event);
+  }
 
   return (
     <div className={'fretboard-svg-wrapper'}>
       <svg
-        // preserveAspectRatio={'none'}
-        viewBox={`0 0 ${fullWidth} ${fullHeight}`}
+        onClick={clickTest}
+        viewBox={`0 0 ${totalWidth} ${totalHeight}`}
       >
         <g
           className={'fretboard-wrapper'}
-          transform={`translate(${paddingLeft}, ${paddingTop}) scale(${width / fullWidth})`}
+          transform={`translate(${paddingLeft}, ${paddingTop}) scale(${width / totalWidth})`}
         >
           {fretInlays}
           {strings}

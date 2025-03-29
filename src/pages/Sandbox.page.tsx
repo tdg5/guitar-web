@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { KeyboardNoteSelector } from '@/components/KeyboardNoteSelector/KeyboardNoteSelector';
 import { FretboardJsOptions, Position, FretboardJsFretboard } from '@/components/FretboardJsFretboard/FretboardJsFretboard';
-import { SvgFretboard } from '@/components/SvgFretboard/SvgFretboard';
+import { SvgFretboard, SvgFretboardOptions } from '@/components/SvgFretboard/SvgFretboard';
 import { INote } from '@/types/INote';
 
 const NoteSelectorInputCallback = (_: INote) => {};
@@ -36,13 +36,18 @@ export function SandboxPage() {
     [positions]
   );
 
+  const svgFretboardOptions: Partial<SvgFretboardOptions> = {
+    nutWidth: 1,
+    scaleFrets: false,
+    showFretInlay: false,
+    showFretNumbers: false,
+  };
+
   return (
     <>
       <FretboardJsFretboard click={click} positions={positions} fretboardOptions={fretboardOptions} />
       <div style={{height: '350px'}} >
-        <SvgFretboard
-          nutWidth={1}
-        />
+        <SvgFretboard {...svgFretboardOptions} />
       </div>
       <KeyboardNoteSelector inputCallback={NoteSelectorInputCallback} />
     </>
